@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="mainPane" prefHeight="768" prefWidth="1566" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.chatapplicatie.ChatController">
+
+    <!-- Topbar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #1f1f1f;">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+         <Label text="TeamFlow" textFill="WHITE">
+            <font>
+               <Font name="Britannic Bold" size="24.0" />
+            </font>
+         </Label>
+            <TextField promptText="Zoeken" style="-fx-background-color: #2b2b2b; -fx-text-fill: white;" HBox.hgrow="ALWAYS" />
+            <Button style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Aanmaken" />
+            <Button text="Bèta" />
+            <Region fx:id="spacer" HBox.hgrow="ALWAYS" />
+            <Button text="🔔" />
+            <Button text="🚀" />
+            <Button text="⚡" />
+            <Button text="★" />
+            <Button text="👤" />
+            <Button text="Delen" />
+            <Button text="⋮" />
+        </HBox>
+    </top>
+
+    <!-- Sidebar links -->
+    <left>
+        <VBox prefHeight="678.0" prefWidth="247.0" spacing="10" style="-fx-background-color: #0c1e40; -fx-background-radius: 12">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+            <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="📥 Inbox" textFill="white" />
+            <Button maxWidth="Infinity" text="Add Card" />
+        </VBox>
+    </left>
+
+    <!-- Middengebied -->
+    <center>
+        <AnchorPane style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #9333ea); -fx-background-radius: 12;">
+         <VBox layoutX="24.0" layoutY="24.0" prefHeight="84.0" prefWidth="220.0" spacing="8" style="-fx-background-color: #0a0a0a; -fx-background-radius: 12; -fx-padding: 10; ">
+            <children>
+               <TextField prefWidth="200" promptText="Lijstnaam opgeven..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" />
+               <HBox spacing="10">
+                  <children>
+                     <Button style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Lijst toevoegen" />
+                     <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
+                  </children>
+               </HBox>
+            </children>
+         </VBox>
+        </AnchorPane>
+    </center>
+
+    <!-- Onderste navigatiebalk -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #111827;">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+            <Button text="📥" />
+            <Button text="📅" />
+            <Button text="🧱" />
+            <Button text="📊" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

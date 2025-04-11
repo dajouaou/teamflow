@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- VoegContactToe.fxml -->
+<VBox spacing="10" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.chatapplicatie.AddContactController">
+    <Label text="Nieuw Contact Toevoegen" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+    <TextField fx:id="nameField" promptText="Naam"/>
+    <TextField fx:id="phoneField" promptText="Telefoonnummer"/>
+    <Button text="Opslaan" fx:id="btnSaveContact" style="-fx-background-color: #28A745; -fx-text-fill: white;" onAction="#handleSaveContact"/>
+</VBox>
+
