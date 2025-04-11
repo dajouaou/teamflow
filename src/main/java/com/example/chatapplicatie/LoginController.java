@@ -18,9 +18,9 @@ public class LoginController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorLabel;
-    @FXML private Button loginButton;
+    @FXML private Button loginButton; // Zorg dat deze fx:id in je FXML staat
 
-    private List<User> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
     private int loginAttempts = 0;
     private static final int MAX_ATTEMPTS = 3;
 
@@ -29,9 +29,7 @@ public class LoginController {
         users.add(new User("admin", "admin123", "Administrator"));
         users.add(new User("user", "user123", "Standaard Gebruiker"));
 
-        // Initiele instellingen
         errorLabel.setOpacity(0);
-        loginButton.setDisable(false);
     }
 
     @FXML
@@ -45,21 +43,20 @@ public class LoginController {
             return;
         }
 
-        String username = usernameField.getText();
-        String password = passwordField.getText();
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
             showError("Vul zowel gebruikersnaam als wachtwoord in", Color.RED);
-            applyShakeAnimation(usernameField.isEmpty() ? usernameField : passwordField);
+            applyShakeAnimation(username.isEmpty() ? usernameField : passwordField);
             return;
         }
 
         User authenticatedUser = authenticate(username, password);
 
         if (authenticatedUser != null) {
-            showError("Login succesvol! Welkom, " + authenticatedUser.getFullName(), Color.GREEN);
+            showError("Login succesvol! Welkom, " + authenticatedUser.fullName(), Color.GREEN);
             applySuccessAnimation(loginButton);
-            // Hier navigatie naar hoofdscherm toevoegen
         } else {
             showError("Ongeldige gebruikersnaam of wachtwoord (poging " + loginAttempts + "/" + MAX_ATTEMPTS + ")", Color.RED);
             applyShakeAnimation(passwordField);
@@ -68,8 +65,8 @@ public class LoginController {
 
     private User authenticate(String username, String password) {
         return users.stream()
-                .filter(user -> user.getUsername().equals(username) &&
-                        user.getPassword().equals(password))
+                .filter(user -> user.username().equals(username) &&
+                        user.password().equals(password))
                 .findFirst()
                 .orElse(null);
     }
@@ -90,7 +87,7 @@ public class LoginController {
         tt.setByX(15);
         tt.setCycleCount(4);
         tt.setAutoReverse(true);
-        tt.setOnFinished(e -> node.setTranslateX(0));
+        tt.setOnFinished(event -> node.setTranslateX(0));
         tt.play();
     }
 
@@ -102,26 +99,13 @@ public class LoginController {
         st.setToY(1.1);
         st.setAutoReverse(true);
         st.setCycleCount(2);
-        st.setOnFinished(e -> {
+        st.setOnFinished(event -> {
             node.setScaleX(1.0);
             node.setScaleY(1.0);
         });
         st.play();
     }
 
-    private static class User {
-        private final String username;
-        private final String password;
-        private final String fullName;
-
-        public User(String username, String password, String fullName) {
-            this.username = username;
-            this.password = password;
-            this.fullName = fullName;
-        }
-
-        public String getUsername() { return username; }
-        public String getPassword() { return password; }
-        public String getFullName() { return fullName; }
-    }
+    // Record class voor onveranderlijke gebruikersdata
+    private record User(String username, String password, String fullName) {}
 }
