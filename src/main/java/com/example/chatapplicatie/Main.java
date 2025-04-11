@@ -10,12 +10,12 @@ import java.io.IOException;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("teamflow.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("startscherm.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("TeamFlow");
         stage.setScene(scene);
         stage.show();
-        stage.setMaximized(true);
+
     }
 
     public static void main(String[] args) {

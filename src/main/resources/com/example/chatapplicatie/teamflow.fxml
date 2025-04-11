@@ -45,7 +45,7 @@
                 <Insets bottom="10" left="10" right="10" top="10" />
             </padding>
             <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="📥 Inbox" textFill="white" />
-            <Button maxWidth="Infinity" text="Add Card" />
+            <Button maxWidth="Infinity" text="User Story 1" fx:id="btnUserStory1" onAction= "#switchToUI" />
         </VBox>
     </left>
 
