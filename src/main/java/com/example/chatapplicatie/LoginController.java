@@ -55,7 +55,7 @@ public class LoginController {
                 .findFirst()
                 .orElse(null);
     }
-
+//private
     private void showError(String message, Color color) {
         errorLabel.setText(message);
         errorLabel.setTextFill(color);
