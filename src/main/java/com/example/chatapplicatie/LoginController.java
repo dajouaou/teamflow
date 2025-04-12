@@ -1,5 +1,6 @@
 package com.example.chatapplicatie;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -7,6 +8,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import java.io.IOException;
 
 public class LoginController {
     @FXML private TextField usernameField;
@@ -26,6 +32,12 @@ public class LoginController {
     }
 
     @FXML
+    private void requestPasswordFocus() {
+        passwordField.requestFocus();
+    }
+
+    // Je bestaande handleLogin methode blijft hetzelfde
+    @FXML
     private void handleLogin() {
         String username = usernameField.getText();
         String password = passwordField.getText();
@@ -42,12 +54,45 @@ public class LoginController {
 
         if (authenticatedUser != null) {
             showError("Login succesvol! Welkom, " + authenticatedUser.getFullName(), Color.GREEN);
-            // Hier zou je naar het hoofdscherm navigeren
+
+            try {
+                // Laad het teamflow.fxml bestand
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("teamflow.fxml"));
+                Parent root = loader.load();
+
+                // Haal het huidige stage object op
+                Stage currentStage = (Stage) usernameField.getScene().getWindow();
+
+                // Maak een nieuwe stage aan
+                Stage newStage = new Stage();
+                newStage.setScene(new Scene(root));
+
+                // Zet de titel en andere properties
+                newStage.setTitle("TeamFlow");
+
+                // Zet de window state properties van de oude stage over
+                newStage.setMaximized(currentStage.isMaximized());
+                newStage.setFullScreen(currentStage.isFullScreen());
+
+                // Sluit de oude stage
+                currentStage.close();
+
+                // Toon de nieuwe stage
+                newStage.show();
+
+                // Forceer maximalisatie als nodig
+                Platform.runLater(() -> {
+                    newStage.setMaximized(true);
+                });
+
+            } catch (IOException e) {
+                showError("Kon het hoofdscherm niet laden", Color.RED);
+                e.printStackTrace();
+            }
         } else {
             showError("Ongeldige gebruikersnaam of wachtwoord", Color.RED);
         }
     }
-
     private User authenticate(String username, String password) {
         return users.stream()
                 .filter(user -> user.getUsername().equals(username) &&

@@ -19,14 +19,12 @@
             <padding>
                 <Insets bottom="10" left="10" right="10" top="10" />
             </padding>
+            <HBox prefHeight="25.0" prefWidth="739.0" />
             <Label text="TeamFlow" textFill="WHITE">
                 <font>
                     <Font name="Britannic Bold" size="24.0" />
                 </font>
             </Label>
-            <TextField promptText="Zoeken" style="-fx-background-color: #2b2b2b; -fx-text-fill: white;" HBox.hgrow="ALWAYS" />
-            <Button style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Aanmaken" />
-            <Button text="Bèta" />
             <Region fx:id="spacer" HBox.hgrow="ALWAYS" />
             <Button text="🔔" />
             <Button text="🚀" />
@@ -45,25 +43,123 @@
                 <Insets bottom="10" left="10" right="10" top="10" />
             </padding>
             <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="📥 Inbox" textFill="white" />
-            <Button maxWidth="Infinity" text="User Story 1" fx:id="btnUserStory1" onAction= "#switchToUI" />
+            <Button fx:id="btnUserStory1" maxWidth="Infinity" onAction="#switchToUI" text="User Story 1" />
+
+            <!-- Chat Container -->
+            <VBox fx:id="chatContainer" prefHeight="678.0" prefWidth="247.0" style="-fx-background-color: #0c1e40; -fx-background-radius: 12" visible="false">
+                <padding>
+                    <Insets bottom="10" left="10" right="10" top="10" />
+                </padding>
+                <HBox alignment="CENTER">
+                    <Button fx:id="closeChatBtn" onAction="#closeChat" text="✕" style="-fx-background-color: transparent; -fx-text-fill: white;"/>
+                    <Label text="Chat" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                </HBox>
+                <VBox fx:id="chatMessages" style="-fx-spacing: 5;" VBox.vgrow="ALWAYS"/>
+                <HBox style="-fx-spacing: 5;">
+                    <TextField fx:id="chatInput" promptText="Type your message..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="sendMessageBtn" onAction="#sendMessage" text="Send" style="-fx-background-color: #3b82f6; -fx-text-fill: white;"/>
+                </HBox>
+            </VBox>
         </VBox>
     </left>
 
     <!-- Middengebied -->
     <center>
-        <AnchorPane style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #9333ea); -fx-background-radius: 12;">
-            <VBox layoutX="24.0" layoutY="24.0" prefHeight="84.0" prefWidth="220.0" spacing="8" style="-fx-background-color: #0a0a0a; -fx-background-radius: 12; -fx-padding: 10; ">
-                <children>
-                    <TextField prefWidth="200" promptText="Lijstnaam opgeven..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" />
-                    <HBox spacing="10">
-                        <children>
-                            <Button style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Lijst toevoegen" />
-                            <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
-                        </children>
-                    </HBox>
-                </children>
+        <HBox style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #9333ea); -fx-background-radius: 12;" spacing="10">
+            <padding>
+                <Insets bottom="10" left="10" right="10" top="10" />
+            </padding>
+
+            <!-- Sprint backlog -->
+            <VBox fx:id="sprintBacklog" style="-fx-background-color: #0a0a0a; -fx-background-radius: 12; -fx-padding: 10;" HBox.hgrow="ALWAYS">
+                <HBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Sprint Backlog" textAlignment="JUSTIFY" textFill="WHITE" />
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <TextField prefWidth="200" promptText="Lijstnaam opgeven..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" />
+                <HBox fx:id="addCardContainer1" spacing="10">
+                    <Button fx:id="addCardBtn1" onAction="#handleAddCard" style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Add Card" />
+                    <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
+                </HBox>
+                <Region VBox.vgrow="ALWAYS"/>
             </VBox>
-        </AnchorPane>
+
+            <!-- Sprint 1 -->
+            <VBox fx:id="sprint1" style="-fx-background-color: #0a0a0a; -fx-background-radius: 12; -fx-padding: 10;" HBox.hgrow="ALWAYS">
+                <HBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Sprint 1" textAlignment="JUSTIFY" textFill="WHITE" />
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <TextField prefWidth="200" promptText="Lijstnaam opgeven..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" />
+                <HBox fx:id="addCardContainer2" spacing="10">
+                    <Button fx:id="addCardBtn2" onAction="#handleAddCard" style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Add Card" />
+                    <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
+                </HBox>
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- To Do -->
+            <VBox fx:id="toDo" style="-fx-background-color: #0a0a0a; -fx-background-radius: 12; -fx-padding: 10;" HBox.hgrow="ALWAYS">
+                <HBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="To Do" textAlignment="JUSTIFY" textFill="WHITE" />
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <TextField prefWidth="200" promptText="Lijstnaam opgeven..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" text="To Do" />
+                <HBox fx:id="addCardContainer3" spacing="10">
+                    <Button fx:id="addCardBtn3" onAction="#handleAddCard" style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Add Card" />
+                    <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
+                </HBox>
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- In Progress -->
+            <VBox fx:id="inProgress" style="-fx-background-color: #0a0a0a; -fx-background-radius: 12; -fx-padding: 10;" HBox.hgrow="ALWAYS">
+                <HBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="In Progress" textAlignment="JUSTIFY" textFill="WHITE" />
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <TextField prefWidth="200" promptText="Lijstnaam opgeven..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" text="In Progress" />
+                <HBox fx:id="addCardContainer4" spacing="10">
+                    <Button fx:id="addCardBtn4" onAction="#handleAddCard" style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Add Card" />
+                    <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
+                </HBox>
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Sprint Review -->
+            <VBox fx:id="sprintReview" style="-fx-background-color: #0a0a0a; -fx-background-radius: 12; -fx-padding: 10;" HBox.hgrow="ALWAYS">
+                <HBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Sprint Review" textAlignment="JUSTIFY" textFill="WHITE" />
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <TextField prefWidth="200" promptText="Lijstnaam opgeven..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" text="Sprint Review" />
+                <HBox fx:id="addCardContainer5" spacing="10">
+                    <Button fx:id="addCardBtn5" onAction="#handleAddCard" style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Add Card" />
+                    <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
+                </HBox>
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Done -->
+            <VBox fx:id="done" style="-fx-background-color: #0a0a0a; -fx-background-radius: 12; -fx-padding: 10;" HBox.hgrow="ALWAYS">
+                <HBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Done" textAlignment="JUSTIFY" textFill="WHITE" />
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+                <TextField prefWidth="200" promptText="Lijstnaam opgeven..." style="-fx-background-color: #1f2937; -fx-text-fill: white;" text="Done" />
+                <HBox fx:id="addCardContainer6" spacing="10">
+                    <Button fx:id="addCardBtn6" onAction="#handleAddCard" style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Add Card" />
+                    <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="✕" />
+                </HBox>
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+        </HBox>
     </center>
 
     <!-- Onderste navigatiebalk -->
@@ -78,5 +174,4 @@
             <Button text="📊" />
         </HBox>
     </bottom>
-
 </BorderPane>
