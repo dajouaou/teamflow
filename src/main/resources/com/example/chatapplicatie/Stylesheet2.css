@@ -1,0 +1,21 @@
+.button:hover {
+    -fx-opacity: 0.9;
+    -fx-cursor: hand;
+}
+
+#btnScrumBoard:hover {
+    -fx-background-color: #2563eb;
+}
+
+#btnReports:hover {
+    -fx-background-color: #4338ca;
+}
+
+#btnLogout:hover {
+    -fx-text-fill: white;
+    -fx-background-color: #334155;
+}
+
+#btnExit:hover {
+    -fx-background-color: #991b1b;
+}

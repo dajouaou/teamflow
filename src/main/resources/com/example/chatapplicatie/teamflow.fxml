@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -42,7 +43,6 @@
                 <Insets bottom="10" left="10" right="10" top="10" />
             </padding>
             <Label style="-fx-font-size: 16; -fx-font-weight: bold;" text="📥 Inbox" textFill="white" />
-            <Button fx:id="btnUserStory1" maxWidth="Infinity" onAction="#switchToUI" text="User Story 1" />
 
             <!-- Chat Container -->
             <VBox fx:id="chatContainer" prefHeight="678.0" prefWidth="247.0" style="-fx-background-color: #0c1e40; -fx-background-radius: 12" visible="false">
@@ -167,4 +167,14 @@
             <Button text="📊" />
         </HBox>
     </bottom>
+    <!-- Voeg dit toe in je hoofdscherm -->
+    <VBox fx:id="taskChatContainer" style="-fx-background-color: #1f2937;" visible="false">
+        <Label fx:id="taskChatTitle" style="-fx-text-fill: white; -fx-font-weight: bold;" text="Chat for: Task 1" />
+        <ListView fx:id="taskChatMessages" style="-fx-background-color: transparent; -fx-text-fill: white;" />
+        <HBox>
+            <TextField fx:id="taskChatInput" promptText="Type your message..." HBox.hgrow="ALWAYS" />
+            <Button onAction="#sendTaskMessage" text="Send" />
+            <Button onAction="#showLinkDialog" text="Link to..." />
+        </HBox>
+    </VBox>
 </BorderPane>
