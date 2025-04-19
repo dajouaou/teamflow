@@ -37,10 +37,17 @@ public class Database {
         public void setDescription(String description) { this.description = description; }
         public List<Message> getLinkedMessages() { return linkedMessages; }
 
-        // Voeg de toString() methode toe zodat de title wordt weergegeven
+        // Voeg de toString() methode toe zodat de titel wordt weergegeven samen met het type
         @Override
         public String toString() {
-            return getTitle();  // Dit zorgt ervoor dat de titel van het object wordt weergegeven
+            if (this instanceof Epic) {
+                return "Epic: " + getTitle();  // Voor Epics
+            } else if (this instanceof UserStory) {
+                return "User Story: " + getTitle();  // Voor User Stories
+            } else if (this instanceof Task) {
+                return "Taak: " + getTitle();  // Voor Taken
+            }
+            return getTitle();  // Als het geen van de bovenstaande is
         }
     }
 

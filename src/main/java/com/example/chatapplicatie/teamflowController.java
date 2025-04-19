@@ -5,7 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.input.MouseEvent; // Import toegevoegd voor MouseEvent
+import javafx.scene.input.MouseEvent;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -22,26 +22,6 @@ public class teamflowController {
     private final List<Database.scrumdb> scrumElementen = new ArrayList<>();
     private Database.scrumdb huidige;  // Geselecteerde Scrum element
     private final Database.User currentUser = new Database.User("Gebruiker");
-
-    @FXML
-    public void initialize() {
-        chatContainer.setVisible(false);  // Chatcontainer verbergen aan het begin
-
-        // **Voorbeeld Data**: Demo Epic, UserStory en Task
-        Database.Epic demoEpic = new Database.Epic("Demo Epic");
-        Database.UserStory demoUS = new Database.UserStory("Demo UserStory");
-        demoEpic.addUserStory(demoUS);
-        Database.Task demoTask = new Database.Task("Demo Taak");
-        demoUS.addTask(demoTask);
-
-        epics.add(demoEpic);
-        scrumElementen.add(demoEpic);
-        scrumElementen.add(demoUS);
-        scrumElementen.add(demoTask);
-
-        // Vul de ListView met Scrum-elementen
-        updateEntityList();
-    }
 
     // **Berichten versturen naar de algemene chat**
     @FXML
@@ -142,7 +122,7 @@ public class teamflowController {
                                 entityInfo)  // Koppeling naar Epic/UserStory/Task
                 );
                 lbl.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: normal;");
-                chatMessagesForEntity.getChildren().add(0, lbl);  // Voeg het bericht bovenaan de VBox toe
+                chatMessagesForEntity.getChildren().add(0, lbl);  // Voeg het bericht bovenaan toe in de VBox
             }
         }
     }
@@ -166,7 +146,7 @@ public class teamflowController {
         dlg.showAndWait().ifPresent(t -> {
             var ep = new Database.Epic(t);
             epics.add(ep);
-            scrumElementen.add(ep);
+            scrumElementen.add(ep);  // Toevoegen aan de juiste lijst van scrumElementen
             updateEntityList();  // Update de ListView
         });
     }
@@ -175,13 +155,13 @@ public class teamflowController {
     @FXML
     public void maakUserStory(ActionEvent e) {
         if (epics.isEmpty()) return;
-        Database.Epic epic = epics.get(0);  // Voor eenvoud, neem de eerste Epic
+        Database.Epic epic = epics.get(epics.size() - 1);  // Neem de laatste Epic
         TextInputDialog dlg = new TextInputDialog();
         dlg.setHeaderText("Nieuwe User Story voor Epic \"" + epic.getTitle() + "\":");
         dlg.showAndWait().ifPresent(t -> {
             var us = new Database.UserStory(t);
             epic.addUserStory(us);
-            scrumElementen.add(us);
+            scrumElementen.add(us);  // Voeg de User Story toe aan de scrumElementen lijst
             updateEntityList();  // Update de ListView
         });
     }
@@ -196,7 +176,7 @@ public class teamflowController {
                 dlg.showAndWait().ifPresent(t -> {
                     var ta = new Database.Task(t);
                     us.addTask(ta);
-                    scrumElementen.add(ta);
+                    scrumElementen.add(ta);  // Voeg de Taak toe aan de scrumElementen lijst
                     updateEntityList();  // Update de ListView
                 });
                 break;
@@ -232,6 +212,6 @@ public class teamflowController {
 
     // **Update de ListView met de Scrum-elementen**
     private void updateEntityList() {
-        entityList.setItems(FXCollections.observableArrayList(scrumElementen));
+        entityList.setItems(FXCollections.observableArrayList(scrumElementen));  // Weergeven van alle scrum-elementen
     }
 }
