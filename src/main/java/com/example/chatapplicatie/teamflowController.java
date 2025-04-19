@@ -30,9 +30,8 @@ public class teamflowController {
         if (!txt.isEmpty()) {
             // Maak een bericht zonder gekoppeld Epic/UserStory/Task (geen linkedEntity)
             var msg = new Database.Message(txt, currentUser, LocalDateTime.now(), null);
-            // Nadat het bericht naar de algemene chat is gestuurd, kan de gebruiker het koppelen
-            // aan een geselecteerde Epic/UserStory/Task
-            showEntitySelectionDialog(msg);  // Toon de keuze om het bericht te koppelen aan een entiteit
+            updateGeneralChatDisplay(msg);  // Update de algemene chat met het bericht zonder gekoppeld element
+            generalChatInput.clear();
         }
     }
 
@@ -63,9 +62,8 @@ public class teamflowController {
         }
 
         lbl.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: normal;");
-
         // Voeg het bericht bovenaan toe in de algemene chat
-        generalChatMessages.getChildren().add(0, lbl);  // `0` is de index om het bovenaan de VBox toe te voegen
+        generalChatMessages.getChildren().add(0, lbl);  // 0 is de index om het bovenaan de VBox toe te voegen
     }
 
     // **Selecteer een Scrum-element (Epic/User Story/Task) en koppel het bericht**
@@ -83,10 +81,10 @@ public class teamflowController {
         alert.showAndWait().ifPresent(response -> {
             Database.scrumdb selected = listView.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                msg.setLinkedEntity(selected);  // Koppel het bericht aan de geselecteerde entiteit
+                msg.setLinkedEntity(selected);  // Koppel het bericht aan het geselecteerde Scrum-element
                 selected.getLinkedMessages().add(msg);  // Voeg het bericht toe aan de geselecteerde entiteit
-                updateGeneralChatDisplay(msg);  // Update de algemene chat met de gekoppelde entiteit
-                updateChatDisplay(selected);  // Update de specifieke chat met de gekoppelde entiteit
+                updateGeneralChatDisplay(msg);  // Update de algemene chat met het gekoppelde Scrum-element
+                updateChatDisplay(selected);  // Update de specifieke chat met het gekoppelde entiteit
             }
         });
     }
@@ -213,5 +211,33 @@ public class teamflowController {
     // **Update de ListView met de Scrum-elementen**
     private void updateEntityList() {
         entityList.setItems(FXCollections.observableArrayList(scrumElementen));  // Weergeven van alle scrum-elementen
+    }
+
+    // **Toevoegen van een Scrum-element via de '+' knop in de algemene chat**
+    @FXML
+    private void showEntitySelectionForMessage(ActionEvent e) {
+        String txt = generalChatInput.getText().trim();
+        if (!txt.isEmpty()) {
+            var msg = new Database.Message(txt, currentUser, LocalDateTime.now(), null); // Maak een bericht zonder gekoppeld element
+
+            // Toon dialoog om een Scrum-element te koppelen aan het bericht
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Koppel Bericht aan Scrum-element");
+            alert.setHeaderText("Selecteer een Epic, User Story of Taak om dit bericht aan te koppelen:");
+
+            // Maak een ListView van de scrum-elementen
+            ListView<Database.scrumdb> listView = new ListView<>();
+            listView.setItems(FXCollections.observableArrayList(scrumElementen));
+
+            alert.getDialogPane().setContent(listView);
+            alert.showAndWait().ifPresent(response -> {
+                Database.scrumdb selected = listView.getSelectionModel().getSelectedItem();
+                if (selected != null) {
+                    msg.setLinkedEntity(selected);  // Koppel het bericht aan het geselecteerde Scrum-element
+                    selected.getLinkedMessages().add(msg);  // Voeg het bericht toe aan de geselecteerde entiteit
+                    updateGeneralChatDisplay(msg);  // Update de chat met het bericht en het gekoppelde Scrum-element
+                }
+            });
+        }
     }
 }

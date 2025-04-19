@@ -47,6 +47,8 @@
             <HBox spacing="10" style="-fx-padding:10;">
                 <TextField fx:id="generalChatInput" promptText="Typ je bericht..." HBox.hgrow="ALWAYS"/>
                 <Button text="Verstuur" onAction="#sendGeneralMessage"/>
+                <!-- Nieuwe knop om een Scrum-element te koppelen -->
+                <Button text="+" onAction="#showEntitySelectionForMessage"/>
             </HBox>
         </VBox>
     </center>
