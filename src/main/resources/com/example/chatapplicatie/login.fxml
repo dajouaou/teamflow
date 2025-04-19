@@ -14,22 +14,32 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.chatapplicatie.LoginController"
-            style="-fx-background-color: #0f172a;">
+            stylesheets="@Stylesheet.css"
+            style="-fx-background-color: #1F2937;">
+
     <children>
-        <VBox alignment="CENTER" spacing="20"
-              style="-fx-background-color: #1f2937; -fx-background-radius: 10;"
-              AnchorPane.topAnchor="100" AnchorPane.bottomAnchor="100"
-              AnchorPane.leftAnchor="200" AnchorPane.rightAnchor="200">
-            <Label text="Login bij TeamFlow" textFill="WHITE" style="-fx-font-size: 24;"/>
-            <TextField fx:id="usernameField" promptText="Gebruikersnaam"
-                       onAction="#requestPasswordFocus"
-                       style="-fx-background-color: #374151; -fx-text-fill: white;"/>
-            <PasswordField fx:id="passwordField" promptText="Wachtwoord"
-                           onAction="#handleLogin"
-                           style="-fx-background-color: #374151; -fx-text-fill: white;"/>
-            <Button text="Login" onAction="#handleLogin"
-                    style="-fx-background-color: #3b82f6; -fx-text-fill: white;"/>
-            <Label fx:id="errorLabel" textFill="RED" visible="false"/>
-        </VBox>
+        <StackPane prefWidth="600" prefHeight="400" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0"
+                   AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+            <VBox alignment="CENTER" spacing="18"
+                  styleClass="login-box"
+                  maxWidth="360" maxHeight="400">
+
+                <Label text="Welkom bij TeamFlow" styleClass="login-title"/>
+
+                <TextField fx:id="usernameField" promptText="Gebruikersnaam"
+                           styleClass="login-textfield"/>
+
+                <PasswordField fx:id="passwordField" promptText="Wachtwoord"
+                               styleClass="login-textfield"/>
+
+                <Button text="Inloggen" onAction="#handleLogin"
+                        styleClass="login-button"/>
+
+                <Label fx:id="errorLabel" visible="false"
+                       styleClass="error-label"/>
+
+            </VBox>
+        </StackPane>
     </children>
 </AnchorPane>
+

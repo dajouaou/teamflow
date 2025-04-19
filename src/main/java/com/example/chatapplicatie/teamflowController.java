@@ -9,6 +9,12 @@ import javafx.scene.input.MouseEvent;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
+import javafx.scene.Node;
+import java.io.IOException;
 
 public class teamflowController {
 
@@ -21,7 +27,7 @@ public class teamflowController {
     private final List<Database.Epic> epics = new ArrayList<>();
     private final List<Database.scrumdb> scrumElementen = new ArrayList<>();
     private Database.scrumdb huidige;  // Geselecteerde Scrum element
-    private final Database.User currentUser = new Database.User("Gebruiker");
+    private final Database.User currentUser = new Database.User(System.getProperty("user.name"));
 
     // **Berichten versturen naar de algemene chat**
     @FXML
@@ -66,29 +72,6 @@ public class teamflowController {
         generalChatMessages.getChildren().add(0, lbl);  // 0 is de index om het bovenaan de VBox toe te voegen
     }
 
-    // **Selecteer een Scrum-element (Epic/User Story/Task) en koppel het bericht**
-    private void showEntitySelectionDialog(Database.Message msg) {
-        // Maak een keuzedialoog om een entiteit (Epic/User Story/Task) te selecteren
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Koppel Bericht aan Scrum-element");
-        alert.setHeaderText("Selecteer een Epic, User Story of Taak om dit bericht aan te koppelen:");
-
-        // Maak een ListView van de scrum-elementen
-        ListView<Database.scrumdb> listView = new ListView<>();
-        listView.setItems(FXCollections.observableArrayList(scrumElementen));
-
-        alert.getDialogPane().setContent(listView);
-        alert.showAndWait().ifPresent(response -> {
-            Database.scrumdb selected = listView.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                msg.setLinkedEntity(selected);  // Koppel het bericht aan het geselecteerde Scrum-element
-                selected.getLinkedMessages().add(msg);  // Voeg het bericht toe aan de geselecteerde entiteit
-                updateGeneralChatDisplay(msg);  // Update de algemene chat met het gekoppelde Scrum-element
-                updateChatDisplay(selected);  // Update de specifieke chat met het gekoppelde entiteit
-            }
-        });
-    }
-
     // **Berichten versturen en koppelen aan de geselecteerde entiteit (Epic/User Story/Task)**
     @FXML
     private void sendMessage(ActionEvent e) {
@@ -105,7 +88,6 @@ public class teamflowController {
     private void updateChatDisplay(Database.scrumdb selected) {
         chatMessagesForEntity.getChildren().clear();
         if (selected != null) {
-            // Toon berichten die gekoppeld zijn aan de geselecteerde Epic/UserStory/Task
             for (var m : selected.getLinkedMessages()) {
                 String entityInfo = selected instanceof Database.Epic ? "Epic: " + selected.getTitle() :
                         selected instanceof Database.UserStory ? "User Story: " + selected.getTitle() :
@@ -117,10 +99,14 @@ public class teamflowController {
                                 m.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm")),
                                 m.getSender().getName(),
                                 m.getContent(),
-                                entityInfo)  // Koppeling naar Epic/UserStory/Task
+                                entityInfo)
                 );
+
                 lbl.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: normal;");
-                chatMessagesForEntity.getChildren().add(0, lbl);  // Voeg het bericht bovenaan toe in de VBox
+                lbl.setWrapText(true);  // <-- belangrijk: zorgt voor afbreken van de tekst
+                lbl.setMaxWidth(320);   // <-- pas dit aan naar de breedte van je rechterpaneel minus padding/marges
+
+                chatMessagesForEntity.getChildren().add(0, lbl);
             }
         }
     }
@@ -239,5 +225,61 @@ public class teamflowController {
                 }
             });
         }
+    }
+
+    @FXML
+    private void backToHomeScreen(ActionEvent event) {
+        try {
+            // Laad het hoofdscherm
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/chatapplicatie/hoofdscherm.fxml"));
+            Parent root = loader.load();
+
+            // Haal het huidige scherm op
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // Maak een nieuw scherm en zet de scène
+            Scene scene = new Scene(root);
+            currentStage.setScene(scene);
+
+            // Zet de grootte van het hoofdscherm naar 1920x1080
+            currentStage.setWidth(1920);
+            currentStage.setHeight(1080);
+
+            // Zet de titel en toon het nieuwe scherm
+            currentStage.setTitle("Hoofdscherm");
+            currentStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Nieuwe configureEntityListView aanroepen bij opstarten
+    @FXML
+    public void initialize() {
+        configureEntityListView();  // Zorgt dat ListView cellen goed afbreken en stylen
+    }
+
+    private void configureEntityListView() {
+        entityList.setCellFactory(listView -> new ListCell<>() {
+            private final Label label = new Label();
+
+            {
+                label.setWrapText(true);  // Zorgt voor automatische regelafbreking
+                label.setStyle("-fx-text-fill: #B0B0B0; -fx-padding: 8;");  // Lichtgrijze tekst (thema-gebonden)
+            }
+
+            @Override
+            protected void updateItem(Database.scrumdb item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    label.setText(item.toString());
+                    label.setMaxWidth(entityList.getWidth() - 24); // Houd marge aan voor scrollbar
+                    setGraphic(label);
+                }
+            }
+        });
     }
 }

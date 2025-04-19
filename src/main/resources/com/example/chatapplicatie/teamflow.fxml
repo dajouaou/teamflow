@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -9,58 +10,77 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.chatapplicatie.teamflowController"
-            style="-fx-background-color: black;">  <!-- Achtergrond van BorderPane zwart -->
+            prefWidth="1920.0" prefHeight="1080.0"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #1e3a8a);">
+
     <!-- Bovenste navigatiebalk -->
     <top>
-        <HBox spacing="10" style="-fx-background-color:#1f1f1f; -fx-padding:10;">
-            <Label text="TeamFlow" textFill="WHITE"/>
+        <HBox spacing="10" style="-fx-background-color:#1f1f1f; -fx-padding: 16;">
+            <!-- Terug naar Hoofdscherm Knop -->
+            <Button text="🏠 Terug" onAction="#backToHomeScreen"
+                    style="-fx-background-color: #374151; -fx-text-fill: white; -fx-background-radius: 8;"/>
+            <Label text="TeamFlow" style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="🔔"/>
+            <Button text="🔔" style="-fx-background-color: #334155; -fx-text-fill: white; -fx-background-radius: 50%;"/>
         </HBox>
     </top>
 
     <!-- Linkerkant: ListView voor Epics, User Stories en Taken -->
     <left>
-        <VBox spacing="10" style="-fx-background-color:#0c1e40; -fx-padding:10;">
-            <Button text="Epic Toevoegen" onAction="#maakEpic"/>
-            <Button text="User Story Toevoegen" onAction="#maakUserStory"/>
-            <Button text="Taak Toevoegen" onAction="#maakTaak"/>
-            <Button text="Wijzig" onAction="#wijzigScrumElement"/>
-            <Button text="Verwijder" onAction="#verwijderScrumElement"/>
+        <VBox spacing="12" style="-fx-background-color:#0c1e40; -fx-padding:14;" prefWidth="280">
+            <Button text="Epic Toevoegen" onAction="#maakEpic"
+                    style="-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 14px; -fx-min-width: 240px;"/>
+            <Button text="User Story Toevoegen" onAction="#maakUserStory"
+                    style="-fx-background-color: #2563EB; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 14px; -fx-min-width: 240px;"/>
+            <Button text="Taak Toevoegen" onAction="#maakTaak"
+                    style="-fx-background-color: #1D4ED8; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 14px; -fx-min-width: 240px;"/>
+            <Button text="Wijzig" onAction="#wijzigScrumElement"
+                    style="-fx-background-color: #334155; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 14px; -fx-min-width: 240px;"/>
+            <Button text="Verwijder" onAction="#verwijderScrumElement"
+                    style="-fx-background-color: #DC2626; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 14px; -fx-min-width: 240px;"/>
             <Separator />
-
-            <!-- Toevoegen van de ListView -->
             <ListView fx:id="entityList" onMouseClicked="#handleEntitySelection"
-                      style="-fx-background-color: #1f2937; -fx-text-fill: white;" />
+                      style="-fx-background-color: #2A2D38; -fx-text-fill: #B0B0B0; -fx-background-radius: 10;"
+                      prefHeight="800"/>
         </VBox>
     </left>
 
     <!-- Midden: Algemene Chat -->
     <center>
-        <VBox fx:id="generalChat" style="-fx-padding:10; -fx-background-color: black;">
-            <Label text="Algemene Chat" style="-fx-text-fill:white;"/>
-            <VBox fx:id="generalChatMessages" spacing="5" prefHeight="300" style="-fx-background-color:#1f2937; -fx-padding:10;"/>
-            <HBox spacing="10" style="-fx-padding:10;">
-                <TextField fx:id="generalChatInput" promptText="Typ je bericht..." HBox.hgrow="ALWAYS"/>
-                <Button text="Verstuur" onAction="#sendGeneralMessage"/>
+        <VBox fx:id="generalChat" spacing="16" style="-fx-padding: 20; -fx-background-color: transparent;" prefWidth="1040">
+            <Label text="Algemene Chat" style="-fx-text-fill:white; -fx-font-size: 22px; font-weight: bold;"/>
+            <VBox fx:id="generalChatMessages" spacing="8" prefHeight="720"
+                  style="-fx-background-color:#1f2937; -fx-padding:16; -fx-background-radius: 8;"/>
+            <HBox spacing="12" style="-fx-padding: 8; align-items: center;">
+                <TextField fx:id="generalChatInput" promptText="Typ je bericht..." HBox.hgrow="ALWAYS"
+                           style="-fx-background-color: #374151; -fx-text-fill: white; -fx-background-radius: 10; -fx-prompt-text-fill: #D1D5DB;"/>
+                <Button text="Verstuur" onAction="#sendGeneralMessage"
+                        style="-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 14px; -fx-min-width: 120px;"/>
                 <!-- Nieuwe knop om een Scrum-element te koppelen -->
-                <Button text="+" onAction="#showEntitySelectionForMessage"/>
+                <Button text="+" onAction="#showEntitySelectionForMessage"
+                        style="-fx-background-color: #22C55E; -fx-text-fill: white; -fx-font-size: 16; -fx-background-radius: 50%; -fx-min-width: 35px; -fx-min-height: 35px; -fx-padding: 0;"/>
             </HBox>
         </VBox>
     </center>
 
     <!-- Rechterkant: Chatcontainer voor berichten gekoppeld aan Epics/User Stories/Taken -->
     <right>
-        <VBox fx:id="chatContainer" visible="false" style="-fx-background-color:#0c1e40; -fx-padding:10;">
-            <VBox fx:id="chatMessagesForEntity" spacing="5" prefHeight="200"/>
-            <HBox spacing="5">
-                <TextField fx:id="chatInput" promptText="Typ je bericht..." HBox.hgrow="ALWAYS"/>
-                <Button text="Verstuur" onAction="#sendMessage"/>
+        <VBox fx:id="chatContainer" visible="false" spacing="10"
+              style="-fx-background-color:#0c1e40; -fx-padding:14; -fx-background-radius: 10;"
+              prefWidth="360">
+            <Label text="Chat voor Entiteit" style="-fx-text-fill: white; -fx-font-size: 18px; font-weight: bold;"/>
+            <VBox fx:id="chatMessagesForEntity" spacing="8" prefHeight="600"
+                  style="-fx-background-color:#1f2937; -fx-background-radius: 10; -fx-padding: 12;"/>
+            <HBox spacing="8">
+                <TextField fx:id="chatInput" promptText="Typ je bericht..." HBox.hgrow="ALWAYS"
+                           style="-fx-background-color: #374151; -fx-text-fill: white; -fx-background-radius: 10; -fx-prompt-text-fill: #D1D5DB;"/>
+                <Button text="Verstuur" onAction="#sendMessage"
+                        style="-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-size: 14px; -fx-min-width: 120px;"/>
             </HBox>
         </VBox>
     </right>
+
 </BorderPane>

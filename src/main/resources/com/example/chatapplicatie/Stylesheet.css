@@ -47,3 +47,59 @@
     -fx-background-color:blue;
     -fx-text-fill:white;
 }
+
+/* Login container */
+.login-box {
+    -fx-background-color: #374151;
+    -fx-background-radius: 14;
+    -fx-padding: 30;
+    -fx-spacing: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 12, 0, 0, 4);
+    -fx-max-width: 360px;
+}
+
+/* Titel */
+.login-title {
+    -fx-font-size: 24px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Input velden */
+.login-textfield {
+    -fx-background-color: #4B5563;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 10 14;
+    -fx-pref-width: 280px;
+    -fx-max-width: 280px;
+}
+
+/* Login knop */
+.login-button {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-background-radius: 8;
+    -fx-padding: 12 22;
+    -fx-effect: dropshadow(three-pass-box, rgba(59,130,246,0.4), 6, 0.2, 0, 1);
+    -fx-pref-width: 280px;
+}
+
+.login-button:hover {
+    -fx-background-color: #2563EB;
+}
+
+/* Foutmelding */
+.error-label {
+    -fx-text-fill: #F87171;
+    -fx-font-size: 13px;
+}
+
+/* Placeholder (promptText) wit maken */
+.text-field .text, .password-field .text {
+    -fx-prompt-text-fill: #D1D5DB;
+}
