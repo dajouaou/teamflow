@@ -1,324 +1,237 @@
 package com.example.chatapplicatie;
 
-import javafx.concurrent.Task;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
-
-import java.io.IOException;
+import javafx.scene.input.MouseEvent; // Import toegevoegd voor MouseEvent
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class teamflowController {
 
-    // UI elementen
-    @FXML private Button btnUserStory1;
-    @FXML private VBox chatContainer;
-    @FXML private VBox chatMessages;
-    @FXML private TextField chatInput;
-    @FXML private Button closeChatBtn;
-    @FXML private VBox sprintBacklog;
-    @FXML private VBox sprint1;
-    @FXML private VBox toDo;
-    @FXML private VBox inProgress;
-    @FXML private VBox sprintReview;
-    @FXML private VBox done;
+    // UI-elementen
+    @FXML private ListView<Database.scrumdb> entityList;  // ListView voor Epics, User Stories en Taken
+    @FXML private VBox chatContainer, chatMessagesForEntity, generalChatMessages;
+    @FXML private TextField chatInput, generalChatInput;
+    @FXML private VBox sprintBacklog, toDo, inProgress, done;
 
-    // Data structuren
-    private Database.User currentUser;
-    private Map<String, Database.scrumdb> entities = new HashMap<>();
-    private Database.scrumdb currentlySelectedEntity;
+    private final List<Database.Epic> epics = new ArrayList<>();
+    private final List<Database.scrumdb> scrumElementen = new ArrayList<>();
+    private Database.scrumdb huidige;  // Geselecteerde Scrum element
+    private final Database.User currentUser = new Database.User("Gebruiker");
 
     @FXML
     public void initialize() {
-        currentUser = new Database.User(System.getProperty("user.name", "User"));
-        setupDragAndDrop();
-    }
-    @FXML private VBox taskChatContainer;
-    @FXML private ListView<String> taskChatMessages;
-    @FXML private TextField taskChatInput;
+        chatContainer.setVisible(false);  // Chatcontainer verbergen aan het begin
 
-    private void setupDragAndDrop() {
-        List<VBox> columns = Arrays.asList(sprintBacklog, sprint1, toDo, inProgress, sprintReview, done);
+        // **Voorbeeld Data**: Demo Epic, UserStory en Task
+        Database.Epic demoEpic = new Database.Epic("Demo Epic");
+        Database.UserStory demoUS = new Database.UserStory("Demo UserStory");
+        demoEpic.addUserStory(demoUS);
+        Database.Task demoTask = new Database.Task("Demo Taak");
+        demoUS.addTask(demoTask);
 
-        for (VBox column : columns) {
-            column.setOnDragOver(event -> {
-                if (event.getGestureSource() != column && event.getDragboard().hasString()) {
-                    event.acceptTransferModes(TransferMode.MOVE);
-                }
-                event.consume();
-            });
+        epics.add(demoEpic);
+        scrumElementen.add(demoEpic);
+        scrumElementen.add(demoUS);
+        scrumElementen.add(demoTask);
 
-            column.setOnDragDropped(event -> {
-                Dragboard db = event.getDragboard();
-                boolean success = false;
-
-                if (db.hasString()) {
-                    String cardName = db.getString();
-                    HBox cardToMove = findCardByName(cardName);
-
-                    if (cardToMove != null) {
-                        removeCardFromAnyList(cardToMove);
-                        int addIndex = column.getChildren().size() - 1;
-                        column.getChildren().add(addIndex, cardToMove);
-                        updateTaskStatus(cardName, column.getId());
-                        success = true;
-                    }
-                }
-                event.setDropCompleted(success);
-                event.consume();
-            });
-        }
+        // Vul de ListView met Scrum-elementen
+        updateEntityList();
     }
 
-    private void updateTaskStatus(String cardName, String columnId) {
-        Database.scrumdb entity = entities.get(cardName);
-        if (entity instanceof Database.Task) {
-            Database.Task task = (Database.Task) entity;
-            switch (columnId) {
-                case "toDo":
-                    task.setStatus(Database.TaskStatus.TODO);
-                    break;
-                case "inProgress":
-                    task.setStatus(Database.TaskStatus.IN_PROGRESS);
-                    break;
-                case "sprintReview":
-                    task.setStatus(Database.TaskStatus.REVIEW);
-                    break;
-                case "done":
-                    task.setStatus(Database.TaskStatus.DONE);
-                    break;
-            }
-        }
-    }
-
+    // **Berichten versturen naar de algemene chat**
     @FXML
-    private void sendMessage(ActionEvent event) {
-        String messageText = chatInput.getText();
-        if (!messageText.isEmpty() && currentlySelectedEntity != null) {
-            Database.Message message = new Database.Message(
-                    messageText,
-                    currentUser,
-                    LocalDateTime.now(),
-                    currentlySelectedEntity
+    private void sendGeneralMessage(ActionEvent e) {
+        String txt = generalChatInput.getText().trim();
+        if (!txt.isEmpty()) {
+            // Maak een bericht zonder gekoppeld Epic/UserStory/Task (geen linkedEntity)
+            var msg = new Database.Message(txt, currentUser, LocalDateTime.now(), null);
+            // Nadat het bericht naar de algemene chat is gestuurd, kan de gebruiker het koppelen
+            // aan een geselecteerde Epic/UserStory/Task
+            showEntitySelectionDialog(msg);  // Toon de keuze om het bericht te koppelen aan een entiteit
+        }
+    }
+
+    // **Toon berichten in de algemene chat**
+    private void updateGeneralChatDisplay(Database.Message msg) {
+        Label lbl;
+
+        // Als het bericht is gekoppeld aan een Scrum-element (Epic, UserStory, Task)
+        if (msg.getLinkedEntity() != null) {
+            String entityInfo = msg.getLinkedEntity() instanceof Database.Epic ? "Epic: " + msg.getLinkedEntity().getTitle() :
+                    msg.getLinkedEntity() instanceof Database.UserStory ? "User Story: " + msg.getLinkedEntity().getTitle() :
+                            msg.getLinkedEntity() instanceof Database.Task ? "Taak: " + msg.getLinkedEntity().getTitle() :
+                                    "Geen Entiteit";
+            lbl = new Label(
+                    String.format("[%s] %s: %s (Gekoppeld aan: %s)",
+                            msg.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm")),
+                            msg.getSender().getName(),
+                            msg.getContent(),
+                            entityInfo)
             );
-            currentlySelectedEntity.getLinkedMessages().add(message);
-            updateChatDisplay();
+        } else {
+            lbl = new Label(
+                    String.format("[%s] %s: %s",
+                            msg.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm")),
+                            msg.getSender().getName(),
+                            msg.getContent())
+            );
+        }
+
+        lbl.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: normal;");
+
+        // Voeg het bericht bovenaan toe in de algemene chat
+        generalChatMessages.getChildren().add(0, lbl);  // `0` is de index om het bovenaan de VBox toe te voegen
+    }
+
+    // **Selecteer een Scrum-element (Epic/User Story/Task) en koppel het bericht**
+    private void showEntitySelectionDialog(Database.Message msg) {
+        // Maak een keuzedialoog om een entiteit (Epic/User Story/Task) te selecteren
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Koppel Bericht aan Scrum-element");
+        alert.setHeaderText("Selecteer een Epic, User Story of Taak om dit bericht aan te koppelen:");
+
+        // Maak een ListView van de scrum-elementen
+        ListView<Database.scrumdb> listView = new ListView<>();
+        listView.setItems(FXCollections.observableArrayList(scrumElementen));
+
+        alert.getDialogPane().setContent(listView);
+        alert.showAndWait().ifPresent(response -> {
+            Database.scrumdb selected = listView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                msg.setLinkedEntity(selected);  // Koppel het bericht aan de geselecteerde entiteit
+                selected.getLinkedMessages().add(msg);  // Voeg het bericht toe aan de geselecteerde entiteit
+                updateGeneralChatDisplay(msg);  // Update de algemene chat met de gekoppelde entiteit
+                updateChatDisplay(selected);  // Update de specifieke chat met de gekoppelde entiteit
+            }
+        });
+    }
+
+    // **Berichten versturen en koppelen aan de geselecteerde entiteit (Epic/User Story/Task)**
+    @FXML
+    private void sendMessage(ActionEvent e) {
+        String txt = chatInput.getText().trim();
+        if (!txt.isEmpty() && huidige != null) {
+            var msg = new Database.Message(txt, currentUser, LocalDateTime.now(), huidige);
+            huidige.getLinkedMessages().add(msg);  // Koppel het bericht aan de geselecteerde entiteit
+            updateChatDisplay(huidige);
             chatInput.clear();
         }
     }
 
-    private void updateChatDisplay() {
-        chatMessages.getChildren().clear();
-        if (currentlySelectedEntity != null) {
-            for (Database.Message msg : currentlySelectedEntity.getLinkedMessages()) {
-                HBox messageBox = new HBox();
-                messageBox.setStyle("-fx-padding: 5;");
-                Label messageLabel = new Label(
-                        String.format("[%s] %s: %s",
-                                msg.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm")),
-                                msg.getSender().getName(),
-                                msg.getContent())
+    // **Chatweergave updaten voor de geselecteerde entiteit**
+    private void updateChatDisplay(Database.scrumdb selected) {
+        chatMessagesForEntity.getChildren().clear();
+        if (selected != null) {
+            // Toon berichten die gekoppeld zijn aan de geselecteerde Epic/UserStory/Task
+            for (var m : selected.getLinkedMessages()) {
+                String entityInfo = selected instanceof Database.Epic ? "Epic: " + selected.getTitle() :
+                        selected instanceof Database.UserStory ? "User Story: " + selected.getTitle() :
+                                selected instanceof Database.Task ? "Taak: " + selected.getTitle() :
+                                        "Geen Entiteit";
+
+                Label lbl = new Label(
+                        String.format("[%s] %s: %s (Gekoppeld aan: %s)",
+                                m.getTimestamp().format(DateTimeFormatter.ofPattern("HH:mm")),
+                                m.getSender().getName(),
+                                m.getContent(),
+                                entityInfo)  // Koppeling naar Epic/UserStory/Task
                 );
-                messageLabel.setStyle("-fx-text-fill: white;");
-                messageBox.getChildren().add(messageLabel);
-                chatMessages.getChildren().add(messageBox);
+                lbl.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: normal;");
+                chatMessagesForEntity.getChildren().add(0, lbl);  // Voeg het bericht bovenaan de VBox toe
             }
         }
     }
 
+    // **Selecteer een Scrum-element (Epic/User Story/Task) uit de ListView**
     @FXML
-    private void closeChat(ActionEvent event) {
-        chatContainer.setVisible(false);
-    }
-
-    private void openChat(String cardName) {
-        currentlySelectedEntity = entities.get(cardName);
-        if (currentlySelectedEntity == null) {
-            currentlySelectedEntity = new Database.Task(cardName);
-            entities.put(cardName, currentlySelectedEntity);
+    public void handleEntitySelection(MouseEvent event) {
+        Database.scrumdb geselecteerd = entityList.getSelectionModel().getSelectedItem();
+        if (geselecteerd != null) {
+            huidige = geselecteerd;  // Geselecteerde Scrum-element
+            chatContainer.setVisible(true);  // Toon de chatcontainer voor specifieke Epic/User Story/Task
+            updateChatDisplay(geselecteerd);  // Update de chatweergave voor dat item
         }
-        chatContainer.setVisible(true);
-        updateChatDisplay();
     }
 
-    private HBox findCardByName(String cardName) {
-        for (VBox list : Arrays.asList(sprintBacklog, sprint1, toDo, inProgress, sprintReview, done)) {
-            for (Node node : list.getChildren()) {
-                if (node instanceof HBox) {
-                    HBox cardContainer = (HBox) node;
-                    for (Node child : cardContainer.getChildren()) {
-                        if (child instanceof Label && ((Label) child).getText().equals(cardName)) {
-                            return cardContainer;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+    // **Maak nieuwe Epic**
+    @FXML
+    public void maakEpic(ActionEvent e) {
+        TextInputDialog dlg = new TextInputDialog();
+        dlg.setHeaderText("Nieuwe Epic titel:");
+        dlg.showAndWait().ifPresent(t -> {
+            var ep = new Database.Epic(t);
+            epics.add(ep);
+            scrumElementen.add(ep);
+            updateEntityList();  // Update de ListView
+        });
     }
 
-    private void removeCardFromAnyList(HBox cardToRemove) {
-        for (VBox list : Arrays.asList(sprintBacklog, sprint1, toDo, inProgress, sprintReview, done)) {
-            if (list.getChildren().remove(cardToRemove)) {
+    // **Maak nieuwe User Story**
+    @FXML
+    public void maakUserStory(ActionEvent e) {
+        if (epics.isEmpty()) return;
+        Database.Epic epic = epics.get(0);  // Voor eenvoud, neem de eerste Epic
+        TextInputDialog dlg = new TextInputDialog();
+        dlg.setHeaderText("Nieuwe User Story voor Epic \"" + epic.getTitle() + "\":");
+        dlg.showAndWait().ifPresent(t -> {
+            var us = new Database.UserStory(t);
+            epic.addUserStory(us);
+            scrumElementen.add(us);
+            updateEntityList();  // Update de ListView
+        });
+    }
+
+    // **Maak nieuwe Taak**
+    @FXML
+    public void maakTaak(ActionEvent e) {
+        for (var elem : scrumElementen) {
+            if (elem instanceof Database.UserStory us) {
+                TextInputDialog dlg = new TextInputDialog();
+                dlg.setHeaderText("Nieuwe Taak voor User Story \"" + us.getTitle() + "\":");
+                dlg.showAndWait().ifPresent(t -> {
+                    var ta = new Database.Task(t);
+                    us.addTask(ta);
+                    scrumElementen.add(ta);
+                    updateEntityList();  // Update de ListView
+                });
                 break;
             }
         }
     }
 
+    // **Wijzig het geselecteerde Scrum-element**
     @FXML
-    public void handleAddCard(ActionEvent event) {
-        Button clickedButton = (Button) event.getSource();
-        HBox container = (HBox) clickedButton.getParent();
-        VBox parentVBox = (VBox) container.getParent();
+    public void wijzigScrumElement(ActionEvent e) {
+        if (huidige == null) return;
+        TextInputDialog dlg = new TextInputDialog(huidige.getTitle());
+        dlg.setHeaderText("Nieuwe titel:");
+        dlg.showAndWait().ifPresent(t -> {
+            huidige.setTitle(t);
+            updateEntityList();  // Update de ListView
+        });
+    }
 
-        HBox inputBox = new HBox(10);
-        inputBox.setStyle("-fx-padding: 5;");
-
-        TextField cardNameField = new TextField();
-        cardNameField.setPromptText("Card name...");
-        cardNameField.setStyle("-fx-background-color: #1f2937; -fx-text-fill: white;");
-        cardNameField.setPrefWidth(120);
-
-        Button confirmButton = new Button("Add");
-        confirmButton.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white;");
-
-        Button cancelButton = new Button("✕");
-        cancelButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
-
-        inputBox.getChildren().addAll(cardNameField, confirmButton, cancelButton);
-        parentVBox.getChildren().add(parentVBox.getChildren().indexOf(container), inputBox);
-
-        confirmButton.setOnAction(e -> {
-            String cardName = cardNameField.getText();
-            if (!cardName.isEmpty()) {
-                createCard(parentVBox, inputBox, cardName);
+    // **Verwijder het geselecteerde Scrum-element**
+    @FXML
+    public void verwijderScrumElement(ActionEvent e) {
+        if (huidige != null) {
+            scrumElementen.remove(huidige);
+            if (huidige instanceof Database.Epic) {
+                epics.remove(huidige);
             }
-        });
-
-        cancelButton.setOnAction(e -> parentVBox.getChildren().remove(inputBox));
-    }
-
-    private void createCard(VBox parentVBox, HBox inputBox, String cardName) {
-        HBox cardContainer = new HBox(5);
-        cardContainer.setStyle("-fx-background-color: #1f2937; -fx-padding: 8; -fx-background-radius: 4;");
-        cardContainer.setMaxWidth(200);
-
-        cardContainer.setOnDragDetected(event -> {
-            Dragboard db = cardContainer.startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent content = new ClipboardContent();
-            content.putString(cardName);
-            db.setContent(content);
-            event.consume();
-        });
-
-        Label cardLabel = new Label(cardName);
-        cardLabel.setStyle("-fx-text-fill: white;");
-        cardLabel.setMaxWidth(100);
-
-        Button detailBtn = new Button("🔍");
-        detailBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
-        detailBtn.setOnAction(e -> showCardDetails(cardName));
-
-        Button chatBtn = new Button("💬");
-        chatBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
-        chatBtn.setOnAction(e -> openChat(cardName));
-
-        Button deleteBtn = new Button("✕");
-        deleteBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: white;");
-        deleteBtn.setOnAction(e -> {
-            parentVBox.getChildren().remove(cardContainer);
-            entities.remove(cardName);
-        });
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        cardContainer.getChildren().addAll(cardLabel, spacer, detailBtn, chatBtn, deleteBtn);
-        parentVBox.getChildren().add(parentVBox.getChildren().indexOf(inputBox), cardContainer);
-        parentVBox.getChildren().remove(inputBox);
-        VBox.setMargin(cardContainer, new Insets(0, 0, 5, 0));
-
-        if (!entities.containsKey(cardName)) {
-            entities.put(cardName, new Database.Task(cardName));
+            huidige = null;
+            chatContainer.setVisible(false);  // Verberg de chatcontainer
+            updateEntityList();  // Update de ListView
         }
     }
 
-    private void showCardDetails(String cardName) {
-        Database.scrumdb entity = entities.get(cardName);
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Card Details");
-        alert.setHeaderText("Details voor: " + cardName);
-
-        if (entity != null) {
-            StringBuilder content = new StringBuilder();
-
-            if (entity instanceof Database.Task) {
-                Database.Task task = (Database.Task) entity;
-                content.append("Type: Taak\n")
-                        .append("Status: ").append(task.getStatus()).append("\n")
-                        .append("Toegewezen aan: ").append(task.getAssignedTo() != null ? task.getAssignedTo().getName() : "Niemand").append("\n")
-                        .append("Geschatte uren: ").append(task.getEstimatedHours()).append("\n");
-            } else if (entity instanceof Database.UserStory) {
-                Database.UserStory userStory = (Database.UserStory) entity;
-                content.append("Type: User Story\n")
-                        .append("Acceptatiecriteria: ").append(userStory.getAcceptanceCriteria()).append("\n");
-            } else if (entity instanceof Database.Epic) {
-                content.append("Type: Epic\n");
-            }
-
-            content.append("\nAantal chatberichten: ").append(entity.getLinkedMessages().size());
-            alert.setContentText(content.toString());
-        } else {
-            alert.setContentText("Geen extra informatie beschikbaar");
-        }
-
-        alert.showAndWait();
-    }
-    @FXML
-    private void sendTaskMessage(ActionEvent event) {
-        // Gebruik dezelfde implementatie als sendMessage maar voor taskChatInput
-        String messageText = taskChatInput.getText();
-        if (!messageText.isEmpty() && currentlySelectedEntity != null) {
-            Database.Message message = new Database.Message(
-                    messageText,
-                    currentUser,
-                    LocalDateTime.now(),
-                    currentlySelectedEntity
-            );
-            currentlySelectedEntity.getLinkedMessages().add(message);
-            updateChatDisplay();
-            taskChatInput.clear();
-        }
-    }
-
-    @FXML
-    private void showLinkDialog(ActionEvent event) {
-        // Implementatie gebaseerd op eerder besproken LinkDialog
-        LinkDialog linkDialog = new LinkDialog();
-        linkDialog.setEntities(new ArrayList<>(entities.values()));
-        linkDialog.setCurrentlySelectedMessage(getLastMessage());
-        linkDialog.setUpdateChatDisplayCallback(this::updateChatDisplay);
-        linkDialog.showLinkDialog();
-    }
-
-    private Database.Message getLastMessage() {
-        if (currentlySelectedEntity != null && !currentlySelectedEntity.getLinkedMessages().isEmpty()) {
-            return currentlySelectedEntity.getLinkedMessages().get(
-                    currentlySelectedEntity.getLinkedMessages().size() - 1
-            );
-        }
-        return null;
+    // **Update de ListView met de Scrum-elementen**
+    private void updateEntityList() {
+        entityList.setItems(FXCollections.observableArrayList(scrumElementen));
     }
 }

@@ -9,40 +9,27 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
 <AnchorPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.chatapplicatie.LoginController"
             style="-fx-background-color: #0f172a;">
     <children>
         <VBox alignment="CENTER" spacing="20"
               style="-fx-background-color: #1f2937; -fx-background-radius: 10;"
-              AnchorPane.topAnchor="100.0" AnchorPane.bottomAnchor="100.0"
-              AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0">
-            <padding>
-                <Insets top="30" bottom="30" left="40" right="40"/>
-            </padding>
-
-            <Label text="Login bij TeamFlow" textFill="WHITE">
-                <font>
-                    <Font name="System Bold" size="24.0"/>
-                </font>
-            </Label>
-
+              AnchorPane.topAnchor="100" AnchorPane.bottomAnchor="100"
+              AnchorPane.leftAnchor="200" AnchorPane.rightAnchor="200">
+            <Label text="Login bij TeamFlow" textFill="WHITE" style="-fx-font-size: 24;"/>
             <TextField fx:id="usernameField" promptText="Gebruikersnaam"
-                       style="-fx-background-color: #374151; -fx-text-fill: white; -fx-font-size: 16;"
                        onAction="#requestPasswordFocus"
-                       prefWidth="300.0" prefHeight="40.0"/>
-
+                       style="-fx-background-color: #374151; -fx-text-fill: white;"/>
             <PasswordField fx:id="passwordField" promptText="Wachtwoord"
-                           style="-fx-background-color: #374151; -fx-text-fill: white; -fx-font-size: 16;"
                            onAction="#handleLogin"
-                           prefWidth="300.0" prefHeight="40.0"/>
-
+                           style="-fx-background-color: #374151; -fx-text-fill: white;"/>
             <Button text="Login" onAction="#handleLogin"
-                    style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;"
-                    defaultButton="true"
-                    prefWidth="300.0" prefHeight="40.0"/>
-
-            <Label fx:id="errorLabel" textFill="RED" visible="false" style="-fx-font-size: 14;"/>
+                    style="-fx-background-color: #3b82f6; -fx-text-fill: white;"/>
+            <Label fx:id="errorLabel" textFill="RED" visible="false"/>
         </VBox>
     </children>
 </AnchorPane>

@@ -5,25 +5,14 @@
 <?import javafx.collections.FXCollections?>
 
 <?import java.lang.String?>
-<Dialog fx:id="linkDialog" title="Link to Scrum Entity"
-        xmlns="http://javafx.com/javafx/8"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="com.example.chatapplicatie.LinkDialog">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<Dialog xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="com.example.chatapplicatie.LinkDialog" title="Link to Scrum Entity">
     <dialogPane>
         <DialogPane>
             <content>
                 <VBox spacing="10">
-                    <Label text="Select entity type:"/>
-                    <ComboBox fx:id="entityTypeCombo">
-                        <items>
-                            <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="Epic"/>
-                                <String fx:value="User Story"/>
-                                <String fx:value="Task"/>
-                            </FXCollections>
-                        </items>
-                    </ComboBox>
+                    <Label text="Selecteer een Scrum Element:"/>
                     <ListView fx:id="entityList" prefHeight="200" prefWidth="300"/>
                 </VBox>
             </content>
